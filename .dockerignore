@@ -1,0 +1,31 @@
+# Python
+**/__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+*.egg-info/
+
+# Django
+backend/dbdata/
+backend/staticfiles/
+backend/db.sqlite3
+
+# Node / frontend build artifacts (frontend/dist IS needed — keep it)
+frontend/node_modules/
+
+# Data
+data/chroma/
+data/neo4j/
+
+# Env / secrets
+.env
+backend/.env
+*.env.local
+
+# Misc
+.git/
+.gitignore
+*.md
+docker-start.bat
+run.bat

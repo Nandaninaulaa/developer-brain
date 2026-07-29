@@ -1,0 +1,1 @@
+web: cd backend && python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn devbrain_project.wsgi:application --bind 0.0.0.0:$PORT --workers ${WEB_CONCURRENCY:-1} --timeout 120
