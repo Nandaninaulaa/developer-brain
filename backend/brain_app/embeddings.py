@@ -2,7 +2,7 @@
 Embedding provider abstraction so the rest of the app doesn't care whether
 embeddings come from a local model or a hosted API.
 
-Default is "local" (sentence-transformers) — zero cost, no API key, works
+Default is "local" (fastembed, torch-free) — zero cost, no API key, works
 offline. Switch EMBEDDING_PROVIDER=openai in .env for better quality once
 you have a key.
 """
@@ -21,12 +21,11 @@ class EmbeddingProvider:
 
 class LocalEmbeddingProvider(EmbeddingProvider):
     def __init__(self, model_name: str):
-        from sentence_transformers import SentenceTransformer
-        self._model = SentenceTransformer(model_name)
+        from fastembed import TextEmbedding
+        self._model = TextEmbedding(model_name=model_name)
 
     def embed(self, texts: list[str]) -> list[list[float]]:
-        vectors = self._model.encode(texts, show_progress_bar=False)
-        return [v.tolist() if hasattr(v, "tolist") else list(v) for v in vectors]
+        return [v.tolist() for v in self._model.embed(texts)]
 
 
 class OpenAIEmbeddingProvider(EmbeddingProvider):

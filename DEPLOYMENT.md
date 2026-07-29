@@ -109,12 +109,11 @@ persist. For a real deployment:
 First request after idle time will be slow (~10-30s) while the embedding
 model loads — that's normal for scale-to-zero.
 
-## Option D — Render free tier + OpenAI embeddings (fits in 512MB)
+## Option D — OpenAI embeddings/answers instead of local (optional, better quality)
 
-Render's free tier (512MB) isn't enough for the local `sentence-transformers`
-model. To fit, switch embeddings to OpenAI's API instead — this removes the
-torch/model memory footprint entirely (the code already supports this, it's
-just an env var switch):
+The default local setup (via `fastembed`) now fits Render's free tier on its
+own — this option is only if you want higher-quality embeddings/generated
+answers and are fine with a small OpenAI cost:
 
 Add these on top of the Option B env vars above:
 | Key | Value |
@@ -140,11 +139,10 @@ mode, using the same key.
     (free tier is fine) instead of relying on the SQLite default.
   - For the vector store: attach a persistent disk/volume and point
     `CHROMA_DIR` at it, or plan to re-ingest after deploys.
-- **The embedding model (`sentence-transformers`) needs real memory** —
-  budget at least ~1GB RAM for the web service. On a 512MB free instance,
-  the first ingest/embed request is a likely cause of an OOM crash. If you
-  hit that, either upgrade the instance or set `WEB_CONCURRENCY=1` to
-  reduce the number of gunicorn workers.
+- **Embeddings run locally via `fastembed`** (ONNX runtime, no `torch`) —
+  this fits comfortably within Render's free 512MB, unlike the earlier
+  `sentence-transformers`/torch setup which didn't. No OpenAI account
+  needed for the default setup.
 
 ---
 

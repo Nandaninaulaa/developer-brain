@@ -23,10 +23,12 @@ DOC_CHUNK_MAX_CHARS = 1000
 CHUNK_OVERLAP_CHARS = 150
 
 # --- Embeddings ----------------------------------------------------------
-# "local" uses sentence-transformers (free, no API key needed).
+# "local" uses fastembed — a lightweight, torch-free ONNX runtime (free,
+# no API key, and small enough to run on memory-constrained free-tier
+# hosting, unlike sentence-transformers/torch which needs much more RAM).
 # "openai" uses OpenAI's embedding API (better quality, needs OPENAI_API_KEY).
 EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "local")
-LOCAL_EMBEDDING_MODEL = os.getenv("LOCAL_EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+LOCAL_EMBEDDING_MODEL = os.getenv("LOCAL_EMBEDDING_MODEL", "BAAI/bge-small-en-v1.5")
 OPENAI_EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 

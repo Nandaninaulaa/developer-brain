@@ -16,7 +16,10 @@ chromadb==0.5.15
 # capture(user_id, event, properties) signature, and letting pip resolve
 # posthog unpinned grabs the latest (incompatible) version.
 posthog<3
-sentence-transformers==3.1.1
+# Lightweight local embeddings — ONNX runtime, no torch. sentence-transformers
+# (torch-based) was pulling well past Render free tier's 512MB memory limit;
+# fastembed does the same job with a much smaller memory footprint.
+fastembed==0.8.0
 pypdf==5.0.1
 openai==1.51.0
 # httpx 0.28+ dropped the 'proxies' kwarg that openai==1.51.0 still passes
