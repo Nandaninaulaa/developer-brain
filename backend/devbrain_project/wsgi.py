@@ -26,14 +26,21 @@ application = get_wsgi_application()
 # respond. Loading it here instead happens during boot, which Render
 # tolerates for much longer than a single HTTP request.
 if os.getenv('PRELOAD_EMBEDDING_MODEL') == 'true':
-    try:
-        from brain_app import config as brain_config
-        if brain_config.EMBEDDING_PROVIDER == 'local':
-            print('==> Preloading local embedding model...', file=sys.stderr, flush=True)
-            from brain_app.embeddings import get_embedding_provider
-            get_embedding_provider()
-            print('==> Embedding model preloaded.', file=sys.stderr, flush=True)
-    except Exception as e:
-        # Never let a preload failure block the server from starting —
-        # worst case it just falls back to loading lazily on first use.
-        print(f'==> Embedding model preload skipped: {e}', file=sys.stderr, flush=True)
+    import threading
+
+    def _preload():
+        try:
+            from brain_app import config as brain_config
+            if brain_config.EMBEDDING_PROVIDER == 'local':
+                print('==> Preloading local embedding model...', file=sys.stderr, flush=True)
+                from brain_app.embeddings import get_embedding_provider
+                get_embedding_provider()
+                print('==> Embedding model preloaded.', file=sys.stderr, flush=True)
+        except Exception as e:
+            print(f'==> Embedding model preload skipped: {e}', file=sys.stderr, flush=True)
+
+    # Run in a background thread so this never blocks gunicorn from binding
+    # the port — Render's deploy health check needs the port to respond
+    # quickly, and blocking here risked the whole deploy timing out rather
+    # than just one slow first request.
+    threading.Thread(target=_preload, daemon=True).start()
