@@ -11,7 +11,8 @@ python manage.py collectstatic --noinput
 
 PORT="${PORT:-8000}"
 echo "==> Starting gunicorn on 0.0.0.0:${PORT}..."
+export PRELOAD_EMBEDDING_MODEL=true
 exec gunicorn devbrain_project.wsgi:application \
     --bind "0.0.0.0:${PORT}" \
     --workers "${WEB_CONCURRENCY:-1}" \
-    --timeout 120
+    --timeout 180
